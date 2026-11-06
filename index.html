@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parable 工作台 · 演示</title>
+<style>
+  :root {
+    --paper: #F7F3EA; --paper-deep: #F1EBDE; --card: #FFFDF8;
+    --ink: #1B2432; --ink-soft: #3A4658; --muted: #6E7683; --faint: #9AA1AB;
+    --line: #E6DFD1; --line-soft: #EFE9DD;
+    --gold: #A8824C; --gold-soft: #F3E7D2; --navy: #1E2E48; --green: #3E7A5E; --red: #A34D3C;
+    --serif: "Noto Serif SC", "Songti SC", "Source Han Serif SC", "STSong", Georgia, serif;
+    --sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans);
+    background-image:
+      radial-gradient(1200px 520px at 12% -8%, rgba(168,130,76,.10), transparent 62%),
+      radial-gradient(900px 420px at 100% 0%, rgba(30,46,72,.05), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(120,98,64,.023) 0 1px, transparent 1px 3px);
+  }
+  button { font: inherit; }
+  .app { display: flex; flex-direction: column; min-height: 100%; }
+  .topline { height: 2px; background: linear-gradient(90deg, transparent, #C9AE7E 18%, #A8824C 50%, #C9AE7E 82%, transparent); }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 26px 44px 0; }
+  .brand { display: flex; align-items: center; gap: 18px; }
+  .mark {
+    width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: var(--navy); color: #F7F1E4; font-family: var(--serif); font-size: 19px; font-weight: 600;
+    box-shadow: 0 0 0 1px rgba(168,130,76,.55), 0 0 0 5px #F9F4E9, 0 0 0 6px rgba(168,130,76,.3), 0 12px 26px -18px rgba(30,46,72,.9);
+  }
+  .brand-name { font-family: var(--serif); font-size: 19px; font-weight: 600; letter-spacing: .22em; }
+  .brand-sub { font-size: 10.5px; color: var(--muted); letter-spacing: .2em; margin-top: 3px; }
+  .head-right { display: flex; align-items: center; gap: 10px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; letter-spacing: .02em;
+    padding: 5px 12px; line-height: 1.4; border-radius: 999px; border: 1px solid var(--line);
+    color: var(--muted); background: #FBF8F1; white-space: nowrap;
+  }
+  .pill.green { color: var(--green); border-color: #CFDFD4; background: #F1F7F3; }
+  .pill.gold { color: #7A5A2E; border-color: #E3D0AF; background: var(--gold-soft); }
+  .pill.navy { color: #3D5375; border-color: #D5DCE8; background: #F2F5FA; }
+  nav { display: flex; gap: 4px; padding: 22px 44px 0; border-bottom: 1px solid var(--line); margin-top: 18px; }
+  .tab {
+    display: flex; align-items: center; gap: 9px; background: transparent; border: none; cursor: pointer;
+    border-bottom: 2px solid transparent; padding: 0 18px 14px; font-size: 13.5px; color: var(--muted); margin-bottom: -1px;
+  }
+  .tab .idx { font-family: var(--serif); font-size: 10.5px; letter-spacing: .1em; color: var(--faint); }
+  .tab.active { color: var(--ink); font-weight: 600; border-bottom-color: var(--gold); }
+  .tab.active .idx { color: var(--gold); }
+  .tab .dot { width: 5px; height: 5px; transform: rotate(45deg); background: #C2A678; display: none; }
+  .tab.active .dot { display: inline-block; }
+  main { flex: 1; padding: 34px 44px 14px; max-width: 1240px; width: 100%; margin: 0 auto; position: relative; }
+  main::before {
+    content: '一生有所悟　故事传后人'; position: absolute; right: 10px; top: 26px;
+    writing-mode: vertical-rl; text-orientation: upright; white-space: nowrap;
+    font-family: var(--serif); font-size: 15px; letter-spacing: .46em; color: rgba(30,46,72,.06);
+    pointer-events: none; user-select: none;
+  }
+  footer {
+    display: flex; align-items: center; justify-content: center; gap: 12px; padding: 20px 44px 22px;
+    color: #A79C88; font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase;
+  }
+  .fade { animation: fade .32s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  h2.page { font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0; letter-spacing: .02em; }
+  .eyebrow { font-size: 10px; letter-spacing: .3em; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; }
+  .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+  .rule { display: flex; align-items: center; justify-content: center; margin: 16px 0 20px; color: #C9B993; font-size: 11px; position: relative; }
+  .rule::before, .rule::after { content: ''; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, var(--line), transparent); }
+  .rule span { padding: 0 14px; }
+  .hint {
+    display: flex; align-items: center; gap: 10px; margin: 0 0 16px; padding: 9px 14px;
+    border: 1px dashed #E0D3BA; border-radius: 10px; background: #FCF8EF;
+    font-size: 12px; color: #7A6A50; line-height: 1.7;
+  }
+  .hint b { color: #7A5A2E; font-weight: 600; }
+  .hint button { margin-left: auto; border: none; background: none; color: #B4A78F; cursor: pointer; font-size: 14px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+    border-radius: 10px; border: 1px solid transparent; white-space: nowrap; font-size: 13.5px; padding: 10px 18px;
+    background: transparent; color: var(--ink-soft); border-color: var(--line); transition: all .18s ease;
+  }
+  .btn:hover { border-color: #D8C7A6; background: #FCF8EF; }
+  .btn.sm { font-size: 12.5px; padding: 7px 12px; }
+  .btn.primary { background: var(--navy); color: #F9F5EC; border-color: var(--navy); }
+  .btn.primary:hover { background: #26395A; }
+  .btn.gold { background: var(--gold-soft); color: #7A5A2E; border-color: #E4D2B4; }
+  .btn.gold:hover { background: #F7EBD8; }
+  .btn.danger { color: var(--red); border-color: #E7CFC8; }
+  .btn[disabled] { cursor: not-allowed; opacity: .6; }
+  .link { background: none; border: none; padding: 0; color: var(--gold); cursor: pointer; font-size: 11.5px; }
+  .link:hover { color: #8C6A3A; }
+
+  /* ---------- 记录页 ---------- */
+  .records-grid { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .rail { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 10px; }
+  .rail-title { font-size: 10px; letter-spacing: .22em; color: var(--gold); text-transform: uppercase; padding: 0 10px; margin-bottom: 8px; }
+  .folder-item { display: flex; align-items: center; gap: 2px; }
+  .folder-row {
+    display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; padding: 8px 10px;
+    border: none; border-radius: 9px; background: transparent; cursor: pointer; text-align: left;
+    font-size: 12.5px; color: var(--ink-soft);
+  }
+  .folder-row:hover { background: #F6F1E6; }
+  .folder-row.active { background: var(--gold-soft); color: #7A5A2E; font-weight: 600; }
+  .folder-row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .folder-row .count { font-size: 11px; color: var(--faint); }
+  .folder-row.active .count { color: #8C6A3A; }
+  .folder-del { border: none; background: transparent; color: #A79C88; cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 5px; opacity: 0; }
+  .folder-item:hover .folder-del { opacity: 1; }
+  .folder-del:hover { color: var(--red); background: #FBEEEA; }
+  .rail-sep { border-top: 1px solid var(--line-soft); margin: 10px 0 8px; }
+  .new-folder { display: flex; gap: 6px; padding: 0 4px; }
+  .new-folder input {
+    flex: 1; min-width: 0; font-size: 12px; color: var(--ink); background: #FFFDF8;
+    border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; font-family: var(--sans);
+  }
+  .new-folder input:focus { outline: none; border-color: #C6A472; box-shadow: 0 0 0 3px rgba(168,130,76,.13); }
+  .new-folder button { border: 1px solid var(--line); background: #FFFDF8; border-radius: 8px; color: var(--gold); cursor: pointer; padding: 0 10px; }
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .toolbar .label { font-size: 11.5px; color: var(--muted); }
+  select.chip, select.filter {
+    font-family: var(--sans); color: var(--muted); background: #FBF8F1; border: 1px solid var(--line);
+    border-radius: 999px; padding: 5px 8px; font-size: 11.5px; max-width: 128px;
+  }
+  select.filter { border-radius: 9px; padding: 6px 9px; font-size: 12.5px; width: 190px; color: var(--ink); background: var(--card); }
+  .rows { display: flex; flex-direction: column; gap: 12px; }
+  .row {
+    display: flex; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px 18px; transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .row:hover { border-color: #DCCDAC; box-shadow: 0 10px 24px -22px rgba(27,36,50,.5); }
+  .row-icon {
+    width: 38px; height: 38px; flex: 0 0 auto; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: 15px; background: #F1F5FA; color: #3D5375;
+  }
+  .row-icon.sim { background: var(--gold-soft); color: #7A5A2E; }
+  .row-icon.imp { background: #F3EFE4; color: #8C6A3A; }
+  .row-main { flex: 1; min-width: 0; }
+  .row-title { font-family: var(--serif); font-size: 16px; font-weight: 600; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-meta { font-size: 12px; color: var(--muted); line-height: 1.8; }
+  .status-chip { border: none; background: none; cursor: default; padding: 0; }
+  .empty {
+    border: 1px dashed var(--line); border-radius: 14px; padding: 44px 20px; text-align: center;
+    font-size: 12.5px; color: var(--faint); line-height: 1.9;
+  }
+
+  /* ---------- 纪要页 ---------- */
+  .record-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+  .record-title { font-family: var(--serif); font-size: 21px; font-weight: 600; margin: 0; }
+  .record-meta { display: flex; align-items: center; gap: 10px; margin-top: 9px; flex-wrap: wrap; font-size: 11.5px; color: var(--faint); }
+  .summary { border: 1px solid var(--line); border-radius: 14px; background: #FBF8F1; margin: 14px 0; }
+  .summary-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; }
+  .summary-tag { font-size: 10px; letter-spacing: .22em; color: var(--gold); text-transform: uppercase; }
+  .summary-title { font-family: var(--serif); font-size: 14px; font-weight: 600; }
+  .modes { display: flex; gap: 6px; flex-wrap: wrap; }
+  .mode {
+    border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 999px;
+    padding: 5px 11px; cursor: pointer; font-size: 11.5px;
+  }
+  .mode.active { border-color: #D8BE93; background: var(--gold-soft); color: #7A5A2E; font-weight: 600; }
+  .summary-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .summary-body { border-top: 1px solid var(--line-soft); padding: 12px 16px 32px; font-size: 13.5px; line-height: 2; color: var(--ink-soft); max-height: 440px; overflow-y: auto; position: relative; }
+  .summary-body::after { content: ''; display: block; position: sticky; bottom: 0; height: 26px; margin-top: -26px; background: linear-gradient(rgba(251,248,241,0), #FBF8F1 82%); pointer-events: none; }
+  .summary-body h4 { font-family: var(--serif); font-size: 14px; margin: 14px 0 6px; color: var(--ink); }
+  .summary-body h4:first-child { margin-top: 0; }
+  .summary-body p { margin: 0 0 8px; }
+  .summary-body ul { margin: 4px 0 10px; padding-left: 20px; }
+  .summary-body li { margin: 3px 0; }
+  .summary-body strong { font-weight: 600; color: var(--ink); }
+  .summary-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 0 16px 13px; margin-top: -12px; font-size: 11.5px; color: var(--faint); }
+  .summary-empty { padding: 14px 16px; font-size: 12.5px; color: var(--muted); line-height: 1.9; border-top: 1px solid var(--line-soft); }
+  .thread { padding: 10px 6px 12px; position: relative; }
+  .msg { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 24px; }
+  .avatar {
+    flex: 0 0 auto; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: 14px; font-weight: 600;
+  }
+  .avatar.q { background: var(--navy); color: #F7F2E7; border: 1px solid var(--navy); }
+  .avatar.a { background: var(--gold-soft); color: #7A5A2E; border: 1px solid #E4D2B4; }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 7px; font-size: 12.5px; }
+  .msg-head .who { font-weight: 600; color: var(--ink-soft); }
+  .msg-head .when { font-size: 11.5px; color: var(--faint); }
+  .bubble {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px;
+    font-size: 14.5px; line-height: 1.95; white-space: pre-wrap; word-break: break-word;
+  }
+  .msg.a .bubble { background: #FBF7EE; border-color: var(--line-soft); }
+  .note-bar { margin-top: 12px; padding: 13px 16px; border-radius: 12px; background: #FBF8F1; border: 1px solid var(--line); font-size: 12.5px; color: var(--muted); line-height: 1.9; }
+
+  /* ---------- 新建页 ---------- */
+  .landing { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 56px; align-items: start; }
+  .landing h1 { font-family: var(--serif); font-size: 33px; font-weight: 600; margin: 0 0 16px; letter-spacing: .02em; }
+  .landing .sub { font-size: 15.5px; color: var(--muted); line-height: 2; margin: 0; max-width: 560px; }
+  .modes-cards { display: flex; gap: 18px; margin: 30px 0; }
+  .mode-card {
+    flex: 1; text-align: left; cursor: pointer; border-radius: 14px; padding: 26px 24px 24px;
+    background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px;
+    box-shadow: inset 0 0 0 4px #FFFDF8, inset 0 0 0 5px #F0E7D6;
+  }
+  .mode-card.active { background: var(--gold-soft); border-color: #D8BE93; box-shadow: inset 0 0 0 4px var(--gold-soft), inset 0 0 0 5px #E6D3B1; }
+  .mode-card .mc-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 24px; }
+  .mode-card .no { font-family: var(--serif); font-size: 12px; color: var(--gold); letter-spacing: .18em; }
+  .mode-card .name { font-family: var(--serif); font-size: 19px; font-weight: 600; }
+  .mode-card .desc { font-size: 14px; color: var(--muted); line-height: 1.8; }
+  .mode-card .badge { font-size: 11px; padding: 3px 9px; border-radius: 999px; border: 1px solid #E3D0AF; background: var(--gold-soft); color: #7A5A2E; white-space: nowrap; }
+  .mode-card .badge.ghost { opacity: 0; }
+  .field { margin-bottom: 22px; }
+  .field-label { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+  .field-label .hint-text { font-size: 11.5px; font-weight: 400; color: var(--faint); }
+  .input, .select {
+    width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink); background: var(--card);
+    border: 1px solid var(--line); border-radius: 12px; padding: 13px 15px;
+  }
+  .select { font-size: 13.5px; padding: 10px 12px; border-radius: 10px; }
+  .input:focus, .select:focus { outline: none; border-color: #C6A472; box-shadow: 0 0 0 3px rgba(168,130,76,.13); }
+  .actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 24px; }
+  .actions .model { font-size: 12.5px; color: var(--faint); }
+  .blue-card {
+    background: var(--navy); color: #F4EEE1; border-radius: 16px; padding: 32px 28px;
+    box-shadow: 0 24px 48px -34px rgba(30,46,72,.8); border: 1px solid rgba(168,130,76,.35);
+  }
+  .blue-card .tag { font-size: 11px; letter-spacing: .24em; color: #D3B27F; margin-bottom: 16px; }
+  .blue-card .big { font-family: var(--serif); font-size: 19px; line-height: 1.95; letter-spacing: .03em; margin-bottom: 14px; }
+  .blue-card .big strong { font-weight: 600; }
+  .blue-card .small { font-size: 13.5px; line-height: 1.95; color: rgba(244,238,225,.72); }
+  .believe { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 26px; margin-top: 20px; }
+  .believe .item { padding: 16px 0; border-top: 1px solid var(--line-soft); }
+  .believe .item:first-of-type { border-top: none; }
+  .believe .item-head { display: flex; align-items: baseline; gap: 12px; }
+  .believe .no { font-family: var(--serif); font-size: 12.5px; color: var(--gold); letter-spacing: .1em; }
+  .believe .name { font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+  .believe .text { font-size: 12.5px; line-height: 1.9; color: var(--muted); margin: 6px 0 0 26px; }
+
+  /* ---------- 设置 ---------- */
+  .settings-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 32px; align-items: start; }
+  .block { margin-bottom: 30px; }
+  .block .body {
+    font-size: 13.5px; line-height: 2; color: var(--ink-soft); background: var(--card);
+    border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; white-space: pre-wrap;
+    max-height: 360px; overflow-y: auto;
+  }
+  .respondents { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 18px; }
+  .respondent {
+    display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .respondent .rn { font-family: var(--serif); font-size: 16.5px; }
+
+  /* ---------- 弹窗 ---------- */
+  .overlay {
+    position: fixed; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center;
+    background: rgba(27,36,50,.32); backdrop-filter: blur(2px);
+  }
+  .overlay.open { display: flex; animation: fade .2s ease both; }
+  .dialog {
+    width: min(580px, calc(100vw - 48px)); max-height: calc(100vh - 64px); overflow-y: auto;
+    background: #FFFDF8; border: 1px solid var(--line); border-radius: 16px; padding: 24px 24px 20px;
+    box-shadow: 0 30px 60px -30px rgba(27,36,50,.5); animation: fade .26s ease both;
+  }
+  .dialog-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .dialog-title { font-family: var(--serif); font-size: 19px; font-weight: 600; }
+  .close { background: none; border: none; color: var(--faint); font-size: 18px; cursor: pointer; line-height: 1; }
+  .dialog p.lead { font-size: 12.5px; color: var(--muted); line-height: 1.9; margin: 8px 0 16px; }
+  .drop {
+    border: 1px dashed var(--line); background: #FFFDF8; border-radius: 12px; padding: 34px 20px;
+    text-align: center; cursor: pointer; transition: all .18s ease;
+  }
+  .drop:hover { border-color: #C6A472; background: #FBF3E3; }
+  .drop .t { font-family: var(--serif); font-size: 16px; margin-bottom: 6px; }
+  .drop .s { font-size: 12px; color: var(--muted); line-height: 1.9; }
+  .preview { border: 1px solid var(--line); border-radius: 12px; background: #FBF8F1; padding: 12px 14px; margin-bottom: 16px; }
+  .preview .meta { font-size: 12px; color: var(--muted); line-height: 1.8; margin-bottom: 8px; }
+  .preview .lines { border-top: 1px dashed var(--line-soft); padding-top: 8px; font-size: 12px; color: var(--ink-soft); line-height: 1.85; }
+  .preview .lines div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .form-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+  .dialog-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 20px; }
+  .demo-badge {
+    position: fixed; right: 16px; bottom: 14px; z-index: 30; font-size: 11px; letter-spacing: .08em;
+    color: #8C7A5C; background: rgba(255,253,248,.92); border: 1px solid #E6DAC3;
+    border-radius: 999px; padding: 5px 12px; box-shadow: 0 8px 20px -16px rgba(27,36,50,.6);
+  }
+  @media (max-width: 1000px) {
+    .landing, .settings-grid { grid-template-columns: minmax(0,1fr); gap: 28px; }
+    header, nav, main, footer { padding-left: 22px; padding-right: 22px; }
+  }
+  @media (max-width: 980px) { .records-grid { grid-template-columns: minmax(0,1fr); } }
+  @media (prefers-reduced-motion: reduce) { .fade, .overlay.open, .dialog { animation: none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topline"></div>
+  <header>
+    <div class="brand">
+      <div class="mark">P</div>
+      <div>
+        <div class="brand-name">PARABLE</div>
+        <div class="brand-sub">一生的故事 · 世代的智慧</div>
+      </div>
+    </div>
+    <div class="head-right">
+      <span class="pill green">演示模式</span>
+      <span class="pill">插件 v0.0.58</span>
+    </div>
+  </header>
+  <nav id="tabs"></nav>
+  <main id="main"></main>
+  <footer><span>Parable</span><span style="color:#C9B993">·</span><span>一生的故事，世代的智慧</span><span style="color:#C9B993">·</span><span id="foot-ver">v0.0.58</span></footer>
+</div>
+<div class="overlay" id="import-modal"></div>
+<div class="demo-badge">演示数据 · 非真实访谈</div>
+<script>
+if (new URLSearchParams(location.search).has('static')) {
+  document.head.insertAdjacentHTML('beforeend', '<style>*{animation:none!important;transition:none!important}</style>')
+}
+/* ------------------------------------------------------------------ *
+ * 演示数据
+ * ------------------------------------------------------------------ */
+const SUMMARY = {
+  whole: `
+    <h4>传承愿景</h4>
+    <ul>
+      <li><strong>眼力</strong>：看出「真正好的东西」和「只是好卖的东西」之间的差别，并愿意为这个差别付代价。</li>
+      <li><strong>克制</strong>：不把主业之外看起来能赚钱的机会当成机会。</li>
+      <li><strong>带人</strong>：先让人在一线做过，再谈判断和授权。</li>
+    </ul>
+    <h4>关键经历与依据</h4>
+    <p>1998 年那批货，客户提出标准可以放一放，他坚持全检，损失约四十万；三年后这家客户把整条产线交了过来。他把这段当作「眼力要付代价」的直接证据。</p>
+    <p>2005 年有人劝他做房地产，他想了三个月没有去。理由不是不想赚钱，而是怕手伸太长，主业的人心先散。</p>
+    <h4>尚未解决的张力</h4>
+    <p>他承认这些目前更接近个人偏好：如果后代拿出真实的一线依据，他愿意改；但「拿出依据」本身怎么判断，记录里没有谈清。</p>
+    <h4>规则的苗头</h4>
+    <p>采访者提过一条：重大投入前要求提案人先在该业务做满三年。他没有直接接受，只说自己当年也是从一线长出来的——这条目前仍停在讨论里。</p>
+  `,
+  respondent: `
+    <h4>他重视什么</h4>
+    <ul>
+      <li><strong>眼力</strong>：判断质量的能力，愿意为它承担短期损失。</li>
+      <li><strong>克制</strong>：对「机会」保持怀疑，尤其是主业以外的钱。</li>
+      <li><strong>一线经验</strong>：没有亲手做过，判断就没有根。</li>
+    </ul>
+    <h4>来由</h4>
+    <p>1998 年坚持全检丢掉的四十万，和三年后拿回的整条产线，是他最常回到的一段经历；2005 年拒绝房地产，则是他解释「克制」时唯一的例子。</p>
+    <h4>边界与条件</h4>
+    <p>可以听不同意见，但要求对方先在相关业务里有真实经历；不接受只凭「别人赚钱」提出的转向。他还未决定是否把这些写成规则。</p>
+    <h4>表达方式</h4>
+    <p>短句，先给判断再补依据；讲道理时习惯用具体年份和金额；被追问规则时会把话收回去（「现在是偏好」）。</p>
+    <h4>仍属推断的部分</h4>
+    <p>「怕人心散」是他的原话，但是否还有别的顾虑（股权、家族分工），记录里没有问过。</p>
+  `,
+  interviewer: `
+    <h4>提问脉络</h4>
+    <ul>
+      <li>第 1 轮：固定开场，问「最希望留下什么」，他给出「眼力」和「克制」。</li>
+      <li>第 2 轮：追「眼力」的来由，得到 1998 年全检事件。</li>
+      <li>第 3 轮：用「后代不同意」试探「克制」的边界，他说要看依据。</li>
+      <li>第 4 轮：问「这是规则还是偏好」，他明确说还是偏好。</li>
+    </ul>
+    <h4>有效的追问</h4>
+    <p>第 3 轮把反对者设成「后代」而不是抽象的「别人」，他因此给出了「在一线做过三年」这个具体条件——这是整场里信息量最大的一句。</p>
+    <h4>错过的机会</h4>
+    <p>第 2 轮他提到「客户后来把整条线给了我们」时，其实可以追问：如果当年没有拿到这条线，他还会坚持全检吗？这一问能直接检验「眼力」是原则还是结果倒推。</p>
+    <h4>还没问到的问题</h4>
+    <ul>
+      <li>「克制」的代价是什么——错过房地产之后，有没有后悔过？</li>
+      <li>如果两个后代一个主张多元化、一个主张克制，他希望怎么处理？</li>
+      <li>他说「怕人心散」，具体怕的是哪些人、散成什么样？</li>
+    </ul>
+    <h4>三条改进建议</h4>
+    <p>① 在得到一段具体经历后，补一句「如果结果不一样，你还会这么想吗」，区分原则与事后合理化。② 当他用「现在是偏好」收回去时，不要立刻转向规则，先问「什么情况下会变成规则」。③ 记录里出现「依据」这种词时，追一个例子，避免停在抽象条件上。</p>
+  `,
+}
+
+const state = {
+  tab: 'records',
+  view: 'records',
+  folders: [
+    { id: 'f1', name: '林先生' },
+    { id: 'f2', name: '2026 Q4 复盘' },
+  ],
+  records: [
+    {
+      id: 'r1', title: '林先生 · 第一次访谈', folder: 'f1', respondent: '林先生',
+      date: '11-06 14:20', q: 4, a: 4, status: 'active', source: 'interview', mode: 'human',
+      summary: null,
+    },
+    {
+      id: 'r2', title: '导入：2019 年家族会议记录', folder: 'f1', respondent: '林先生',
+      date: '11-05 09:12', q: 6, a: 6, status: 'ended', source: 'import', mode: 'human',
+      summary: { mode: 'whole', at: '11-05 09:40' },
+    },
+    {
+      id: 'r3', title: '乔布斯模拟 · 传承与产品', folder: 'f2', respondent: '乔布斯（模拟）',
+      date: '11-04 16:02', q: 9, a: 9, status: 'ended', source: 'interview', mode: 'simulation',
+      summary: null,
+    },
+    {
+      id: 'r4', title: '林先生 · 第二次访谈', folder: '', respondent: '林先生',
+      date: '11-02 10:30', q: 2, a: 2, status: 'active', source: 'interview', mode: 'human',
+      summary: null,
+    },
+  ],
+  filters: { folder: 'all', respondent: '' },
+  summaryMode: 'whole',
+  summaryBusy: false,
+  hint: true,
+  importStep: 'idle', // idle | parsing | preview
+  importForm: { title: '林先生访谈（2026-10-18）', respondent: '林先生', folder: '' },
+}
+
+const MESSAGES = [
+  { who: 'interviewer', round: 1, when: '14:20', text: '让我们来设想一个场景：\n很多年以后，您已经不再亲自经营了，企业和后代还在往前走，时代和做事的方式可能都跟现在不一样了。到那时候，您最希望留给企业和后代的，是哪些词、哪些做事的方式或原则？\n\n如果您愿意，也可以说说这些东西为什么对您重要。' },
+  { who: 'respondent', when: '14:22', text: '我最想留下的是「眼力」。1998 年那批货，客户说标准可以放一放，我还是坚持全检。当时损失了大概四十万，但三年后那家客户把整条线都给了我们。\n\n第二件事是「克制」。2005 年有人劝我做房地产，我想了三个月，最后没去。不是不想赚钱，是怕手伸太长，主业的人心就散了。' },
+  { who: 'interviewer', round: 2, when: '14:24', text: '如果后代不同意「克制」这条，坚持要多元化，您会怎么想？' },
+  { who: 'respondent', when: '14:25', text: '我可以听，但要看他们拿什么依据。如果只是看别人赚钱，我不认。要是他们真在一线做过三年，我可能会改。' },
+  { who: 'interviewer', round: 3, when: '14:27', text: '您觉得这些是规则，还是只是您个人的偏好？' },
+  { who: 'respondent', when: '14:29', text: '现在是偏好。写成规则还早，我还没想清楚怎么防止有人拿「眼力」当借口，一句话就把别人的判断压下去。' },
+]
+
+/* ------------------------------------------------------------------ *
+ * 小工具
+ * ------------------------------------------------------------------ */
+const $ = (sel, root = document) => root.querySelector(sel)
+const html = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]))
+const folderName = (id) => state.folders.find((f) => f.id === id)?.name ?? ''
+const currentRecord = () => state.records.find((r) => r.id === state.currentId) ?? null
+
+const TABS = [
+  { id: 'interview', label: '访谈', index: '01' },
+  { id: 'records', label: '记录', index: '02' },
+  { id: 'settings', label: '设置', index: '03' },
+]
+
+function folderOptions(selected, withAll) {
+  const rows = [`<option value="">${withAll ? '全部文件夹' : '未分类'}</option>`]
+  for (const folder of state.folders) {
+    rows.push(`<option value="${html(folder.id)}"${folder.id === selected ? ' selected' : ''}>${html(folder.name)}</option>`)
+  }
+  return rows.join('')
+}
+
+/* ------------------------------------------------------------------ *
+ * 渲染：外壳
+ * ------------------------------------------------------------------ */
+function renderTabs() {
+  $('#tabs').innerHTML = TABS.map((tab) => `
+    <button class="tab${state.tab === tab.id ? ' active' : ''}" data-action="tab" data-tab="${tab.id}">
+      <span class="dot"></span>
+      <span class="idx">${tab.index}</span>${tab.label}
+    </button>`).join('')
+}
+
+function render() {
+  renderTabs()
+  const main = $('#main')
+  if (state.tab === 'records') {
+    main.innerHTML = state.view === 'record' ? recordView() : recordsView()
+  } else if (state.tab === 'interview') {
+    main.innerHTML = landingView()
+  } else {
+    main.innerHTML = settingsView()
+  }
+  renderImportModal()
+}
+
+/* ------------------------------------------------------------------ *
+ * 记录列表
+ * ------------------------------------------------------------------ */
+function recordsView() {
+  const counts = new Map()
+  for (const record of state.records) counts.set(record.folder || '', (counts.get(record.folder || '') ?? 0) + 1)
+  const respondents = [...new Set(state.records.map((r) => r.respondent).filter(Boolean))]
+  const visible = state.records.filter((record) => {
+    const byFolder = state.filters.folder === 'all'
+      || (state.filters.folder === 'none' ? !record.folder : record.folder === state.filters.folder)
+    if (!byFolder) return false
+    if (state.filters.respondent && record.respondent !== state.filters.respondent) return false
+    return true
+  })
+
+  const folderRow = (key, label, count, deletable = false) => `
+    <div class="folder-item">
+      <button class="folder-row${state.filters.folder === key ? ' active' : ''}" data-action="filter-folder" data-key="${html(key)}">
+        <span class="name">${html(label)}</span><span class="count">${count}</span>
+      </button>
+      ${deletable ? '<button class="folder-del" data-action="del-folder" data-key="' + html(key) + '" title="删除文件夹">×</button>' : ''}
+    </div>`
+
+  return `
+    <div class="fade">
+      ${state.hint ? hintBar() : ''}
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Archive</div>
+          <h2 class="page">访谈记录</h2>
+        </div>
+        <span style="font-size:12px;color:var(--faint);letter-spacing:.06em">共 ${state.records.length} 场</span>
+      </div>
+      <div class="rule"><span>❖</span></div>
+      <div class="records-grid">
+        <aside class="rail">
+          <div class="rail-title">Folders</div>
+          ${folderRow('all', '全部', state.records.length)}
+          ${folderRow('none', '未分类', counts.get('') ?? 0)}
+          ${state.folders.map((folder) => folderRow(folder.id, folder.name, counts.get(folder.id) ?? 0, true)).join('')}
+          <div class="rail-sep"></div>
+          <div class="new-folder">
+            <input id="new-folder" placeholder="新建文件夹" maxlength="24" aria-label="新建文件夹">
+            <button data-action="new-folder" title="新建文件夹">＋</button>
+          </div>
+        </aside>
+        <div>
+          <div class="toolbar">
+            <span class="label">受访者</span>
+            <select class="filter" data-action="filter-respondent">
+              <option value="">全部受访者</option>
+              ${respondents.map((name) => `<option value="${html(name)}"${name === state.filters.respondent ? ' selected' : ''}>${html(name)}</option>`).join('')}
+            </select>
+            <span style="margin-left:auto;font-size:11.5px;color:var(--faint)">显示 ${visible.length} / ${state.records.length} 场</span>
+          </div>
+          ${visible.length === 0
+            ? '<div class="empty">这个范围里还没有记录。换个文件夹或受访者看看。</div>'
+            : `<div class="rows">${visible.map(rowView).join('')}</div>`}
+        </div>
+      </div>
+    </div>`
+}
+
+function rowView(record) {
+  const icon = record.source === 'import' ? '导' : record.mode === 'simulation' ? '⟡' : '◌'
+  const iconClass = record.source === 'import' ? ' imp' : record.mode === 'simulation' ? ' sim' : ''
+  const meta = [
+    record.date,
+    `${record.q} 问 / ${record.a} 答`,
+    'v2.6.5',
+    record.respondent,
+    record.summary ? '已总结' : '',
+  ].filter(Boolean).join(' · ')
+  return `
+    <div class="row">
+      <div class="row-icon${iconClass}">${icon}</div>
+      <div class="row-main">
+        <div class="row-title">${html(record.title)}</div>
+        <div class="row-meta">${html(meta)}</div>
+      </div>
+      <select class="chip" data-action="move" data-id="${record.id}" title="移动到文件夹">
+        ${folderOptions(record.folder, false)}
+      </select>
+      <span class="pill${record.status === 'ended' ? '' : ' green'}">${record.status === 'ended' ? '已结束' : '进行中'}</span>
+      <button class="btn sm" data-action="export">导出</button>
+      <button class="btn sm gold" data-action="open" data-id="${record.id}">打开 ↗</button>
+    </div>`
+}
+
+function hintBar() {
+  return `
+    <div class="hint">
+      <span><b>演示</b>：点任意一条记录看「纪要总结」；在左栏新建文件夹、按受访者筛选；「访谈」页可以试「导入纪要」。</span>
+      <button data-action="dismiss-hint" aria-label="关闭提示">×</button>
+    </div>`
+}
+
+/* ------------------------------------------------------------------ *
+ * 纪要详情
+ * ------------------------------------------------------------------ */
+function recordView() {
+  const record = currentRecord()
+  if (!record) return '<div class="empty">记录不存在。</div>'
+  const summary = record.summary
+  const imported = record.source === 'import'
+  const modes = [['whole', '整体梳理'], ['respondent', '受访者要点'], ['interviewer', '采访者复盘']]
+  const body = summary
+    ? `<div class="summary-body">${SUMMARY[state.summaryMode] ?? SUMMARY.whole}</div>
+       <div class="summary-foot">
+         <span>${modes.find((m) => m[0] === state.summaryMode)?.[1] ?? ''} · ${summary.at} · 基于 ${MESSAGES.length} 条发言</span>
+         <button class="link" data-action="copy">复制全文</button>
+       </div>`
+    : `<div class="summary-empty">还没有总结。点「生成总结」，会按「${modes.find((m) => m[0] === state.summaryMode)?.[1]}」的口径读完整份记录再整理；生成后可以换口径重做。</div>`
+
+  return `
+    <div class="fade">
+      <div class="record-head">
+        <div>
+          <div class="pills">
+            <span class="pill${record.status === 'ended' ? '' : ' green'}">${record.status === 'ended' ? '已结束' : '进行中'}</span>
+            <span class="pill">${record.mode === 'simulation' ? '模拟访谈' : '真人访谈'}</span>
+            ${imported ? '<span class="pill gold">导入纪要</span>' : ''}
+            <span class="pill gold">v2.6.5</span>
+          </div>
+          <h2 class="record-title">${html(record.title)}</h2>
+          <div class="record-meta">
+            <span>文件夹</span>
+            <select class="chip" data-action="move" data-id="${record.id}">${folderOptions(record.folder, false)}</select>
+            <span>受访者：${html(record.respondent || '—')}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn sm" data-action="export">导出</button>
+          <button class="btn sm" data-action="back">← 记录</button>
+          <button class="btn sm" data-action="tab" data-tab="interview" style="background:#FAF2E3;border-color:#E0CBA6;color:#7B5B2E">新建访谈</button>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="summary-bar">
+          <span class="summary-tag">Summary</span>
+          <span class="summary-title">纪要总结</span>
+          <div class="modes">
+            ${modes.map(([id, label]) => `<button class="mode${state.summaryMode === id ? ' active' : ''}" data-action="mode" data-mode="${id}">${label}</button>`).join('')}
+          </div>
+          <div class="summary-actions">
+            ${summary ? `<button class="link" data-action="toggle-summary">收起</button>` : ''}
+            <button class="btn sm gold" data-action="summary" ${state.summaryBusy ? 'disabled' : ''}>${state.summaryBusy ? '整理中…' : summary ? '重新生成' : '生成总结'}</button>
+          </div>
+        </div>
+        ${summary ? body : `<div class="summary-empty">还没有总结。点「生成总结」试试——这里会模拟 1 秒的整理过程。</div>`}
+      </div>
+
+      <div class="thread">
+        ${MESSAGES.map((message) => `
+          <div class="msg ${message.who === 'interviewer' ? 'q' : 'a'}">
+            <div class="avatar ${message.who === 'interviewer' ? 'q' : 'a'}">${message.who === 'interviewer' ? '问' : '答'}</div>
+            <div class="msg-body">
+              <div class="msg-head">
+                <span class="who">${message.who === 'interviewer' ? `采访者 · 第 ${message.round} 轮` : html(record.respondent || '受访者')}</span>
+                <span class="when">${message.when}</span>
+              </div>
+              <div class="bubble">${html(message.text)}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      ${imported
+        ? '<div class="note-bar">这是一份导入的纪要：可以生成总结、移动文件夹或导出，但不会再生成新的问答。</div>'
+        : '<div class="note-bar">演示到这里为止：真实插件里，这里可以继续作答、语音转写与润色，或结束访谈。</div>'}
+    </div>`
+}
+
+/* ------------------------------------------------------------------ *
+ * 新建访谈
+ * ------------------------------------------------------------------ */
+function landingView() {
+  return `
+    <div class="fade landing">
+      <div>
+        <div class="eyebrow">Pre-Interview</div>
+        <h1>开始一场预访谈</h1>
+        <p class="sub">陪家族企业创始人回望走过的路，把一生积累的经验、判断与精神，留给下一代。</p>
+        <div class="rule" style="margin:26px 0 30px"><span>❖</span></div>
+        <div class="modes-cards">
+          <div class="mode-card active">
+            <div class="mc-top"><span class="no">01</span><span class="badge">已选择</span></div>
+            <div class="name">真人访谈</div>
+            <div class="desc">由采访者提问，您本人作答。</div>
+          </div>
+          <div class="mode-card">
+            <div class="mc-top"><span class="no">02</span><span class="badge ghost">已选择</span></div>
+            <div class="name">模拟访谈</div>
+            <div class="desc">由本地人物或 Jobs 语料扮演受访者，用来检验采访者。</div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label"><span>访谈名称</span><span class="hint-text">可留空</span></div>
+          <input class="input" placeholder="例如：我的创业经历与传承期待">
+        </div>
+        <div class="field">
+          <div class="field-label"><span>受访者</span><span class="hint-text">记录页可按受访者筛选</span></div>
+          <input class="input" placeholder="例如：林先生" value="林先生">
+        </div>
+        <div class="field">
+          <div class="field-label"><span>所属文件夹</span><span class="hint-text">记录页可按文件夹筛选</span></div>
+          <select class="select">${folderOptions('f1', true)}</select>
+        </div>
+        <div class="actions">
+          <span class="model">模型路由：DSH 默认模型</span>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="btn" data-action="open-import">导入纪要</button>
+            <button class="btn primary" data-action="start">开始访谈 ↗</button>
+          </div>
+        </div>
+      </div>
+      <aside style="display:flex;flex-direction:column;gap:20px">
+        <div class="blue-card">
+          <div class="tag">什么是 PARABLE</div>
+          <div class="big"><strong>Parable，家族寓言</strong><br>通过经历传承智慧。</div>
+          <div class="small">企业可以继承，财富可以安排；塑造一位创始人的经历与判断，只有被讲述，才能传下去。</div>
+        </div>
+        <div class="believe">
+          <div class="eyebrow">我们期待</div>
+          <div class="item">
+            <div class="item-head"><span class="no">01</span><span class="name">重新发现创始人的智慧</span></div>
+            <div class="text">从具体经历里，发现传承愿景的本质。</div>
+          </div>
+          <div class="item">
+            <div class="item-head"><span class="no">02</span><span class="name">让故事承担教化</span></div>
+            <div class="text">保留困境、犹豫与教训，不把故事标签化。</div>
+          </div>
+          <div class="item">
+            <div class="item-head"><span class="no">03</span><span class="name">走向家族共同的未来</span></div>
+            <div class="text">让「为什么珍视这些原则」成为家族对话与治理的起点。</div>
+          </div>
+        </div>
+      </aside>
+    </div>`
+}
+
+/* ------------------------------------------------------------------ *
+ * 设置
+ * ------------------------------------------------------------------ */
+function settingsView() {
+  return `
+    <div class="fade">
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Interviewer</div>
+          <h2 class="page">采访者设置</h2>
+        </div>
+        <div style="display:flex;gap:8px">
+          <span class="pill gold">采访者 v2.6.5</span>
+          <span class="pill">只读</span>
+        </div>
+      </div>
+      <div class="rule"><span>❖</span></div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.9;margin:0 0 26px">当前版本的人设与方法由产品方维护，界面仅供查看。已经开始的访谈会保留开始时的配置快照。</p>
+      <div class="settings-grid">
+        <div class="block">
+          <div class="field-label"><span>人设 / Persona</span><span class="hint-text">约 4.5k 字</span></div>
+          <div class="body">你的第一身份是服务者，作为深度采访者帮助企业家梳理家族传承意愿。以受访者的关切和表达节奏为中心，让他有空间讲清、探索和保留自己的想法。
+
+通过他的经历、长期实践和真实选择，理解他希望企业与后代延续什么、为什么重要、何时成立，以及愿意承担什么代价。
+
+你可以贡献独立判断和有依据的不同考虑。不把赢得争论、让他认错、得到赞同或增加条款作为目标。</div>
+        </div>
+        <div class="block">
+          <div class="field-label"><span>访谈方法 / Skills</span><span class="hint-text">4 个 skill</span></div>
+          <div class="body">core-vision-sensing：识别与记录 / 每轮维护（深查焦点 → 快扫其他 → 再决定是否换线）
+experience-probing：经历与认识演变
+contradiction-testing：张力与边界
+rule-formulation：简短规则探索</div>
+        </div>
+      </div>
+      <div style="margin-top:36px;padding-top:26px;border-top:1px solid var(--line)">
+        <div class="eyebrow">Respondents</div>
+        <h2 class="page" style="font-size:22px;margin-bottom:18px">模拟受访者</h2>
+        <div class="respondents">
+          <div class="respondent"><span class="rn">虚构创始人 · 林先生</span><span class="pill">虚构人物</span></div>
+          <div class="respondent"><span class="rn">乔布斯 · Jobs（历史人物模拟）</span><span class="pill navy">本地语料</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--faint);margin-top:14px;line-height:1.85">带本地语料的受访者按资料作答；模拟回答由模型生成，不代表本人观点。</div>
+      </div>
+    </div>`
+}
+
+/* ------------------------------------------------------------------ *
+ * 导入弹窗
+ * ------------------------------------------------------------------ */
+function renderImportModal() {
+  const modal = $('#import-modal')
+  if (!state.importOpen) {
+    modal.className = 'overlay'
+    modal.innerHTML = ''
+    return
+  }
+  modal.className = 'overlay open'
+  const step = state.importStep
+  const form = state.importForm
+  const body = step === 'preview'
+    ? `
+      <div class="preview">
+        <div class="meta">林先生访谈_2026-10-18.docx · Word · 识别为对话体，6 轮 · 约 353 字</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          <span class="pill navy">问 · 采访者 3 次</span>
+          <span class="pill gold">答 · 受访者 3 次</span>
+        </div>
+        <div class="lines">
+          <div>问：很多年以后，您不再亲自经营了，您最希望留给企业和后代的，是哪些词、哪些做法？</div>
+          <div style="opacity:.72">答：我最想留下的是「眼力」……</div>
+          <div style="opacity:.5">问：如果后代不同意「克制」这条，坚持要多元化，您会怎么想？</div>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:16px">
+        <div class="field-label"><span>纪要名称</span><span class="hint-text">可改</span></div>
+        <input class="input" data-field="title" value="${html(form.title)}" style="font-size:14px;padding:10px 12px;border-radius:10px">
+      </div>
+      <div class="form-grid">
+        <div>
+          <div class="field-label"><span>受访者</span><span class="hint-text">用于筛选</span></div>
+          <input class="input" data-field="respondent" value="${html(form.respondent)}" style="font-size:14px;padding:10px 12px;border-radius:10px">
+        </div>
+        <div>
+          <div class="field-label"><span>文件夹</span></div>
+          <select class="select" data-field="folder">${folderOptions(form.folder, false)}</select>
+        </div>
+      </div>`
+    : `
+      <div class="drop" data-action="pick-file">
+        <div class="t">${step === 'parsing' ? '正在解析…' : '选择或拖入文件'}</div>
+        <div class="s">Word 请用 .docx（旧版 .doc 先在 Word 里另存为 .docx）；单个文件上限 15MB。</div>
+      </div>`
+
+  modal.innerHTML = `
+    <div class="dialog" role="dialog" aria-modal="true">
+      <div class="dialog-head">
+        <div class="dialog-title">导入纪要</div>
+        <button class="close" data-action="close-import" aria-label="关闭">×</button>
+      </div>
+      <p class="lead">支持 Word（.docx）与纯文本（.txt / .md）。会按「问：/答：」「采访者：/受访者：」「Q:/A:」这类说话人标记拆成逐轮；认不出说话人时，整篇作为一份原始纪要导入。</p>
+      ${body}
+      <div class="dialog-foot">
+        ${step === 'preview'
+          ? '<button class="link" data-action="pick-file">换一个文件</button>'
+          : '<span></span>'}
+        <div style="display:flex;gap:10px">
+          <button class="btn sm" data-action="close-import">取消</button>
+          <button class="btn sm primary" data-action="confirm-import" ${step === 'preview' ? '' : 'disabled'}>${step === 'parsing' ? '处理中…' : '导入'}</button>
+        </div>
+      </div>
+    </div>`
+}
+
+/* ------------------------------------------------------------------ *
+ * 交互
+ * ------------------------------------------------------------------ */
+function toast(message) {
+  const el = document.createElement('div')
+  el.textContent = message
+  el.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:60;background:#1E2E48;color:#F7F2E7;padding:10px 16px;border-radius:10px;font-size:13px;box-shadow:0 18px 40px -24px rgba(0,0,0,.7)'
+  document.body.appendChild(el)
+  setTimeout(() => el.remove(), 2200)
+}
+
+document.addEventListener('click', (event) => {
+  const target = event.target.closest('[data-action]')
+  if (!target) {
+    if (event.target.id === 'import-modal') closeImport()
+    return
+  }
+  const action = target.dataset.action
+
+  if (action === 'tab') {
+    state.tab = target.dataset.tab
+    state.view = 'records'
+    if (state.tab === 'records') state.currentId = null
+    render()
+    return
+  }
+  if (action === 'dismiss-hint') { state.hint = false; render(); return }
+  if (action === 'filter-folder') { state.filters.folder = target.dataset.key; render(); return }
+  if (action === 'del-folder') {
+    const id = target.dataset.key
+    const name = folderName(id)
+    state.folders = state.folders.filter((f) => f.id !== id)
+    state.records = state.records.map((r) => (r.folder === id ? { ...r, folder: '' } : r))
+    if (state.filters.folder === id) state.filters.folder = 'all'
+    toast(`文件夹「${name}」已删除，里面的纪要移到未分类`)
+    render()
+    return
+  }
+  if (action === 'new-folder') {
+    const input = $('#new-folder')
+    const name = (input?.value ?? '').trim()
+    if (!name) return
+    if (state.folders.some((f) => f.name === name)) { toast('已经有同名文件夹了'); return }
+    const id = `f${Date.now()}`
+    state.folders.push({ id, name })
+    state.filters.folder = id
+    toast(`文件夹「${name}」已创建`)
+    render()
+    return
+  }
+  if (action === 'open') {
+    state.currentId = target.dataset.id
+    state.view = 'record'
+    state.summaryMode = state.records.find((r) => r.id === state.currentId)?.summary?.mode ?? 'whole'
+    render()
+    return
+  }
+  if (action === 'back') { state.view = 'records'; state.currentId = null; render(); return }
+  if (action === 'mode') { state.summaryMode = target.dataset.mode; render(); return }
+  if (action === 'summary') {
+    const record = currentRecord()
+    if (!record) return
+    state.summaryBusy = true
+    render()
+    setTimeout(() => {
+      record.summary = { mode: state.summaryMode, at: '刚刚' }
+      state.summaryBusy = false
+      render()
+    }, 1100)
+    return
+  }
+  if (action === 'copy') {
+    navigator.clipboard?.writeText(document.querySelector('.summary-body')?.innerText ?? '')
+      .then(() => toast('已复制'))
+      .catch(() => toast('复制失败，可以直接选中文字'))
+    return
+  }
+  if (action === 'export') { toast('演示环境：导出不在这一版里'); return }
+  if (action === 'start') {
+    const id = `r${Date.now()}`
+    state.records.unshift({
+      id, title: '林先生 · 新访谈', folder: state.folders[0]?.id ?? '', respondent: '林先生',
+      date: '刚刚', q: 1, a: 0, status: 'active', source: 'interview', mode: 'human', summary: null,
+    })
+    state.tab = 'records'
+    state.currentId = id
+    state.view = 'record'
+    state.summaryMode = 'whole'
+    toast('已创建演示记录（不会真的调用模型）')
+    render()
+    return
+  }
+  if (action === 'open-import') { state.importOpen = true; state.importStep = 'idle'; renderImportModal(); return }
+  if (action === 'close-import') { closeImport(); return }
+  if (action === 'pick-file') {
+    state.importStep = 'parsing'
+    renderImportModal()
+    setTimeout(() => { state.importStep = 'preview'; renderImportModal() }, 900)
+    return
+  }
+  if (action === 'confirm-import') {
+    const form = state.importForm
+    const record = {
+      id: `r${Date.now()}`,
+      title: form.title || '导入的纪要',
+      folder: form.folder,
+      respondent: form.respondent,
+      date: '刚刚', q: 3, a: 3, status: 'active', source: 'import', mode: 'human',
+      summary: null,
+    }
+    state.records.unshift(record)
+    closeImport()
+    state.tab = 'records'
+    state.currentId = record.id
+    state.view = 'record'
+    state.summaryMode = 'whole'
+    toast('已导入 6 条发言')
+    render()
+    return
+  }
+})
+
+function closeImport() {
+  state.importOpen = false
+  state.importStep = 'idle'
+  renderImportModal()
+}
+
+document.addEventListener('change', (event) => {
+  const el = event.target
+  if (el.dataset?.action === 'move') {
+    const record = state.records.find((r) => r.id === el.dataset.id)
+    if (record) {
+      record.folder = el.value
+      toast(record.folder ? `已移到「${folderName(record.folder)}」` : '已移到未分类')
+      render()
+    }
+    return
+  }
+  if (el.dataset?.action === 'filter-respondent') { state.filters.respondent = el.value; render(); return }
+  if (el.dataset?.field) { state.importForm[el.dataset.field] = el.value }
+})
+
+document.addEventListener('input', (event) => {
+  const field = event.target.dataset.field
+  if (!field) return
+  state.importForm[field] = event.target.value
+})
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeImport()
+  if (event.key === 'Enter' && event.target.id === 'new-folder') {
+    document.querySelector('[data-action="new-folder"]')?.click()
+  }
+})
+
+/* 允许用 #/record/r2、#/interview、#/settings、#/import 直接打开某个画面（也方便截图） */
+function applyHash() {
+  const raw = (location.hash || '').replace(/^#\/?/, '')
+  if (!raw) return
+  if (raw.startsWith('record/')) {
+    const id = raw.slice(7)
+    const record = state.records.find((r) => r.id === id)
+    if (record) {
+      state.tab = 'records'
+      state.view = 'record'
+      state.currentId = id
+      state.summaryMode = record.summary?.mode ?? 'whole'
+      return
+    }
+  }
+  if (raw === 'records') { state.tab = 'records'; state.view = 'records'; return }
+  if (raw === 'interview') { state.tab = 'interview'; return }
+  if (raw === 'settings') { state.tab = 'settings'; return }
+  if (raw === 'import') { state.tab = 'interview'; state.importOpen = true }
+}
+
+applyHash()
+render()
+
+if (new URLSearchParams(location.search).has('selftest')) {
+  (async () => {
+    const results = []
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+    const check = (name, ok) => results.push(`${ok ? 'PASS' : 'FAIL'} ${name}`)
+    const click = (selector) => document.querySelector(selector)?.click()
+
+    click('[data-tab="interview"]')
+    check('tab-interview', state.tab === 'interview')
+
+    click('[data-action="open-import"]')
+    check('import-open', state.importOpen === true)
+    click('[data-action="pick-file"]')
+    await wait(1200)
+    check('import-preview', state.importStep === 'preview')
+    click('[data-action="close-import"]')
+    check('import-close', state.importOpen === false)
+
+    click('[data-tab="records"]')
+    click('[data-action="open"]')
+    check('record-open', state.view === 'record')
+    click('[data-action="summary"]')
+    await wait(1400)
+    check('summary-generated', Boolean(currentRecord()?.summary))
+    click('[data-action="back"]')
+    check('record-back', state.view === 'records')
+
+    const select = document.querySelector('select[data-action="move"]')
+    select.value = 'f2'
+    select.dispatchEvent(new Event('change', { bubbles: true }))
+    check('move-record', state.records.some((record) => record.folder === 'f2'))
+
+    const input = document.querySelector('#new-folder')
+    input.value = '测试文件夹'
+    click('[data-action="new-folder"]')
+    check('new-folder', state.folders.some((folder) => folder.name === '测试文件夹'))
+    check('filter-count', document.body.innerText.includes('测试文件夹'))
+
+    document.title = results.every((row) => row.startsWith('PASS'))
+      ? `SELFTEST OK ${results.length}`
+      : `SELFTEST FAIL ${results.filter((row) => row.startsWith('FAIL')).join(',')}`
+  })()
+}
+</script>
+</body>
+</html>
