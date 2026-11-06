@@ -23,8 +23,42 @@
       repeating-linear-gradient(0deg, rgba(120,98,64,.023) 0 1px, transparent 1px 3px);
   }
   button { font: inherit; }
-  .app { display: flex; flex-direction: column; min-height: 100%; }
-  .topline { height: 2px; background: linear-gradient(90deg, transparent, #C9AE7E 18%, #A8824C 50%, #C9AE7E 82%, transparent); }
+  .app { position: relative; display: flex; flex-direction: column; min-height: 100%; }
+  header, nav, main, footer { position: relative; z-index: 1; }
+  .topline { height: 2px; background: linear-gradient(90deg, transparent, #C9AE7E 18%, #A8824C 50%, #C9AE7E 82%, transparent); position: relative; z-index: 2; }
+  .wall {
+    position: absolute; top: 126px; left: 0; right: 0; height: 360px; overflow: hidden;
+    pointer-events: none; z-index: 0; opacity: 0; transition: opacity .4s ease;
+  }
+  .app.walled .wall { opacity: 1; }
+  .wall-img { position: absolute; inset: 0; background: url(assets/mural.jpg) center 30% / cover no-repeat; opacity: .55; }
+  .wall-fade {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, #F7F3EA 0%, rgba(247,243,234,0) 16%, rgba(247,243,234,0) 44%, rgba(247,243,234,.62) 72%, rgba(247,243,234,.92) 90%, #F7F3EA 100%),
+      linear-gradient(90deg, rgba(247,243,234,.86) 0%, rgba(247,243,234,.42) 40%, rgba(247,243,234,0) 66%);
+  }
+  .app.walled nav { border-bottom-color: rgba(210,199,178,.85); }
+
+  /* 封面图说明：点问号展开 */
+  .cover-note { position: relative; }
+  .app:not(.walled) .cover-note { display: none; }
+  .note-btn {
+    width: 26px; height: 26px; border-radius: 50%; cursor: pointer; line-height: 1;
+    border: 1px solid rgba(255,255,255,.6); background: rgba(255,253,248,.72); color: #7A5A2E;
+    font-family: var(--serif); font-size: 14px; backdrop-filter: blur(6px);
+  }
+  .note-btn:hover { background: rgba(255,253,248,.92); }
+  .note-card {
+    position: absolute; right: 0; top: 34px; width: 420px; max-width: calc(100vw - 48px);
+    background: rgba(255,253,248,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,.75); border-radius: 14px; padding: 17px 19px;
+    box-shadow: 0 26px 54px -32px rgba(27,36,50,.62); display: none; z-index: 60; text-align: left;
+  }
+  .cover-note.open .note-card { display: block; }
+  .note-title { font-family: var(--serif); font-size: 13.5px; letter-spacing: .1em; color: var(--ink); margin-bottom: 10px; }
+  .note-card p { font-family: var(--serif); font-size: 13px; line-height: 2.05; color: var(--ink-soft); margin: 0 0 10px; }
+  .note-foot { font-size: 11px; color: var(--faint); letter-spacing: .06em; border-top: 1px solid rgba(230,223,209,.9); padding-top: 9px; }
   header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 26px 44px 0; }
   .brand { display: flex; align-items: center; gap: 18px; }
   .mark {
@@ -296,6 +330,10 @@
 </head>
 <body>
 <div class="app">
+  <div class="wall" aria-hidden="true">
+    <div class="wall-img"></div>
+    <div class="wall-fade"></div>
+  </div>
   <div class="topline"></div>
   <header>
     <div class="brand">
@@ -306,6 +344,15 @@
       </div>
     </div>
     <div class="head-right">
+      <div class="cover-note" id="cover-note">
+        <button class="note-btn" data-action="toggle-note" aria-label="关于封面图" aria-expanded="false">?</button>
+        <div class="note-card">
+          <div class="note-title">鹿王本生图 · 北魏</div>
+          <p>佛教的本生故事，讲述佛陀前世的修行与善行。慈悲、信义与人生的智慧，被寄托在一个个故事之中，供世人领悟，代代传述。</p>
+          <p>九色鹿救人，却遭背弃。它在国王面前陈情，令其醒悟。古人将这段故事绘于敦煌石壁，使其中的教诲穿越千年，至今仍能启迪观者。</p>
+          <div class="note-foot">敦煌莫高窟第 257 窟 · 北魏 · 画面为局部</div>
+        </div>
+      </div>
       <span class="pill green">演示模式</span>
       <span class="pill">插件 v0.0.58</span>
     </div>
@@ -459,6 +506,9 @@ function renderTabs() {
 
 function render() {
   renderTabs()
+  const walled = state.tab === 'interview'
+  document.querySelector('.app').classList.toggle('walled', walled)
+  if (!walled) closeNote()
   const main = $('#main')
   if (state.tab === 'records') {
     main.innerHTML = state.view === 'record' ? recordView() : recordsView()
@@ -839,9 +889,19 @@ document.addEventListener('click', (event) => {
   const target = event.target.closest('[data-action]')
   if (!target) {
     if (event.target.id === 'import-modal') closeImport()
+    if (!event.target.closest('.cover-note')) closeNote()
     return
   }
   const action = target.dataset.action
+  if (!event.target.closest('.cover-note')) closeNote()
+
+  if (action === 'toggle-note') {
+    const box = document.querySelector('.cover-note')
+    const open = !box.classList.contains('open')
+    box.classList.toggle('open', open)
+    document.querySelector('.note-btn').setAttribute('aria-expanded', open ? 'true' : 'false')
+    return
+  }
 
   if (action === 'tab') {
     state.tab = target.dataset.tab
@@ -946,6 +1006,11 @@ document.addEventListener('click', (event) => {
   }
 })
 
+function closeNote() {
+  document.querySelector('.cover-note')?.classList.remove('open')
+  document.querySelector('.note-btn')?.setAttribute('aria-expanded', 'false')
+}
+
 function closeImport() {
   state.importOpen = false
   state.importStep = 'idle'
@@ -974,7 +1039,7 @@ document.addEventListener('input', (event) => {
 })
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') closeImport()
+  if (event.key === 'Escape') { closeImport(); closeNote() }
   if (event.key === 'Enter' && event.target.id === 'new-folder') {
     document.querySelector('[data-action="new-folder"]')?.click()
   }
@@ -1003,6 +1068,9 @@ function applyHash() {
 
 applyHash()
 render()
+if (new URLSearchParams(location.search).has('note')) {
+  document.querySelector('.cover-note')?.classList.add('open')
+}
 
 if (new URLSearchParams(location.search).has('selftest')) {
   (async () => {
